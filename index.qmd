@@ -1,0 +1,99 @@
+---
+title: "Delitos de Costa Rica"
+author: "Jefferson Espinoza"
+format: 
+  html:
+    toc: true
+lang: es
+---
+
+# Presentación
+Este documento presenta estadísticas de delitos cometidos en Costa Rica, los datos provienen del [sitio de datos del Organismo de Investigación Judicial (OIJ)](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos).
+
+# Carga y muestra de los datos
+```{r}
+#| label: carga-muestra-datos
+#| code-fold: true
+
+delitos_2022 <- read.csv("OIJ2022.csv")
+
+# Tabla con las 10 primeras filas y con columnas seleccionadas
+knitr::kable(
+	head(
+		delitos_2022[, c("Delito","SubDelito", "Fecha", "Victima", "Edad", "Provincia")], 
+		25
+	),
+	caption = "Muestra de datos de delitos cometidos en 2022 en Costa Rica"
+)
+```
+
+# Gráfico de delitos por provincia
+
+## Barras verticales
+```{r}
+#| label: delitos-provincia-barras-verticales
+#| code-fold: true
+tabla_delitos <- table(delitos_2022$Provincia)
+
+# Ordenar descendentemente la tabla de frecuencia
+tabla_delitos_ordenada <- sort(tabla_delitos, decreasing = TRUE)
+
+# Gráfico de barras verticales
+barplot(
+	height = tabla_delitos_ordenada,
+	main = "Cantidad de delitos cometidos en 2022 por provincia", 
+	sub = "Fuente: OIJ",
+	col = "brown",
+	las = 2, # inclinación de las etiquetas (valor entre 0 y 3)
+	cex.names = 0.5,  # tamaño de las etiquetas
+	cex.axis = 0.7 # tamaño de los números en el eje 
+)
+```
+```{r}
+# Gráfico de barras horizontales
+barplot(
+	height = tabla_delitos_ordenada,
+	main = "Cantidad de delitos cometidos en 2022 por provincia", 
+	sub = "Fuente: OIJ",
+	col = "brown",
+	las = 2,
+	cex.names = 0.5,
+	cex.axis = 0.7,
+	horiz = TRUE
+)
+```
+```{r}
+
+### Pastel
+```{r}
+#| label: cantidad-delitos-provincia-pastel
+#| code-fold: true
+
+# Crear tabla de frecuencias
+tabla_delitos <- table(delitos_2022$Provincia)
+
+# Ordenar ascendentemente la tabla de frecuencia
+tabla_delitos_ordenada <- sort(tabla_delitos)
+
+# Gráfico de pastel
+pie(
+  tabla_delitos_ordenada,
+  main = "Cantidad de delitos cometidos en 2022 por provincia",
+  sub = "Fuente: OIJ",
+  col = rainbow(length(tabla_delitos_ordenada)),
+  cex = 0.8,
+  labels = paste0(
+  	round(100 * tabla_delitos_ordenada / sum(tabla_delitos_ordenada), 1), 
+  	"%"
+  )
+)
+# Agregar leyenda
+legend(
+  "topright",
+  legend = names(tabla_delitos_ordenada),
+  fill = rainbow(length(tabla_delitos_ordenada)),
+  cex = 0.8,
+  bty = "n" # quitar el marco de la leyenda, valor = ("n", "o")
+)
+```
+
